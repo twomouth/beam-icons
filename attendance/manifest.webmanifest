@@ -1,0 +1,23 @@
+{
+  "name": "BEAM 打刻",
+  "short_name": "BEAM 打刻",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#168eea",
+  "icons": [
+    {
+      "src": "https://twomouth.github.io/beam-icons/beam-attendance.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://twomouth.github.io/beam-icons/beam-attendance.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#25a55a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="BEAM 実務">
+  <title>BEAM 実務</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="https://twomouth.github.io/beam-icons/beam-work.png">
+  <link rel="icon" type="image/png" href="https://twomouth.github.io/beam-icons/beam-work.png">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <style>
+    :root { color-scheme: light; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Noto Sans JP", sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f5f7fa; color: #172033; padding: 24px; }
+    .card { width: min(440px, 100%); background: #fff; border-radius: 22px; padding: 28px; box-shadow: 0 14px 45px rgba(24,37,56,.13); text-align: center; }
+    .icon { width: 96px; height: 96px; border-radius: 22px; display: block; margin: 0 auto 16px; }
+    h1 { margin: 0 0 8px; font-size: 26px; }
+    p { margin: 8px 0; line-height: 1.65; color: #596579; }
+    .setup { margin-top: 20px; text-align: left; }
+    label { display:block; font-weight: 700; margin-bottom: 7px; }
+    input { width:100%; font:inherit; padding:12px 13px; border:1px solid #b8c2d1; border-radius:10px; }
+    button { width:100%; margin-top:12px; border:0; border-radius:12px; padding:13px 16px; font:inherit; font-weight:800; color:#fff; background:#25a55a; cursor:pointer; }
+    .small { font-size: 13px; }
+    .ok { color:#197942; font-weight:700; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <img class="icon" src="https://twomouth.github.io/beam-icons/beam-work.png" alt="">
+    <h1>BEAM 実務</h1>
+    <div id="browserHelp">
+      <p>このページをホーム画面に追加してください。</p>
+      <p class="small">ホーム画面から起動すると、自動でBEAMを開きます。</p>
+    </div>
+    <div id="keySetup" class="setup" hidden>
+      <label for="accessKey">初回のみアクセスキーを入力</label>
+      <input id="accessKey" type="password" autocomplete="off" inputmode="text" placeholder="アクセスキー">
+      <button id="saveKey" type="button">保存してBEAMを開く</button>
+      <p class="small">アクセスキーはこの端末内だけに保存し、GitHubには送信しません。</p>
+    </div>
+    <p id="status" class="small"></p>
+  </main>
+<script>
+(function () {
+  'use strict';
+  const PORTAL = 'work';
+  const GAS_BASE = 'https://script.google.com/macros/s/AKfycbwDODf0lpZNt_MbclJXS0quH38EzmwjCmUEq9Oy8JyW-JXX-9k8OSifbVzzVwZdAApa/exec';
+  const STORAGE_KEY = 'beam_access_key_v1';
+
+  function isStandalone() {
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  }
+
+  function getHashKey() {
+    const raw = String(location.hash || '').replace(/^#/, '');
+    if (!raw) return '';
+    const m = raw.match(/^(?:key=)?(.+)$/);
+    return m ? decodeURIComponent(m[1]).trim() : '';
+  }
+
+  function saveKey(key) {
+    if (!key) return;
+    localStorage.setItem(STORAGE_KEY, key);
+  }
+
+  function openBeam(key) {
+    const url = GAS_BASE + '?portal=' + encodeURIComponent(PORTAL) + '&key=' + encodeURIComponent(key);
+    location.replace(url);
+  }
+
+  const hashKey = getHashKey();
+  if (hashKey) {
+    saveKey(hashKey);
+    history.replaceState(null, document.title, location.pathname + location.search);
+  }
+
+  if (!isStandalone()) {
+    document.getElementById('browserHelp').hidden = false;
+    const hasKey = !!localStorage.getItem(STORAGE_KEY);
+    document.getElementById('status').innerHTML = hasKey
+      ? '<span class="ok">アクセスキー保存済み</span>'
+      : 'ホーム画面から初回起動時にアクセスキーを入力できます。';
+    return;
+  }
+
+  document.getElementById('browserHelp').hidden = true;
+  const stored = String(localStorage.getItem(STORAGE_KEY) || '').trim();
+  if (stored) {
+    openBeam(stored);
+    return;
+  }
+
+  const setup = document.getElementById('keySetup');
+  const input = document.getElementById('accessKey');
+  setup.hidden = false;
+  input.focus();
+  document.getElementById('saveKey').addEventListener('click', function () {
+    const key = String(input.value || '').trim();
+    if (!key) {
+      document.getElementById('status').textContent = 'アクセスキーを入力してください。';
+      return;
+    }
+    saveKey(key);
+    openBeam(key);
+  });
+})();
+</script>
+</body>
+</html>
