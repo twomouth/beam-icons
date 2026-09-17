@@ -1,21 +1,16 @@
 {
+  "id": "/beam-icons/work/",
   "name": "BEAM 実務",
   "short_name": "BEAM 実務",
-  "start_url": "./",
-  "scope": "./",
+  "start_url": "/beam-icons/work/",
+  "scope": "/beam-icons/work/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#25a55a",
   "icons": [
     {
-      "src": "https://twomouth.github.io/beam-icons/beam-work.png",
-      "sizes": "180x180",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "https://twomouth.github.io/beam-icons/beam-work.png",
-      "sizes": "512x512",
+      "src": "/beam-icons/beam-work.png?v=20260918b",
+      "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "any"
     }
