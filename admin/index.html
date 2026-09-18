@@ -39,31 +39,91 @@
   'use strict';
   const PORTAL = 'admin';
   const GAS_BASE = 'https://script.google.com/macros/s/AKfycbz-fuUpCKr5s6NhlsKXarmVDSpuRjsoDZ0hBN6Ef8HRZTrZcLSvkctLv54QqwHFzrTx/exec';
+  const DEVICE_TOKEN_KEY = 'beam_device_token_v1';
 
   function isStandalone() {
     return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   }
 
-  function isMobileBrowser() {
-    const ua = String(navigator.userAgent || '');
-    const uaMobile = /iPhone|iPad|iPod|Android/i.test(ua);
-    const touchMobile = navigator.maxTouchPoints > 1 && Math.min(window.innerWidth, window.innerHeight) < 900;
-    return uaMobile || touchMobile;
+  function readToken() {
+    try {
+      const token = String(localStorage.getItem(DEVICE_TOKEN_KEY) || '').trim();
+      return token.indexOf('BDT1_') === 0 ? token : '';
+    } catch (err) {
+      return '';
+    }
+  }
+
+  function saveToken(token) {
+    try {
+      localStorage.setItem(DEVICE_TOKEN_KEY, token);
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  function clearToken() {
+    try { localStorage.removeItem(DEVICE_TOKEN_KEY); } catch (err) {}
+  }
+
+  function launcherUrl() {
+    return location.origin + location.pathname;
+  }
+
+  function readHash() {
+    const raw = String(location.hash || '').replace(/^#/, '');
+    const params = new URLSearchParams(raw);
+    return {
+      token: String(params.get('beam_token') || '').trim(),
+      clear: params.get('beam_clear') === '1'
+    };
+  }
+
+  function cleanHash() {
+    if (!location.hash) return;
+    try {
+      history.replaceState(null, document.title, location.pathname + location.search);
+    } catch (err) {}
   }
 
   function openBeam() {
-    // GitHub側にはアクセスキーも端末トークンも保存しない。
-    location.replace(GAS_BASE + '?portal=' + encodeURIComponent(PORTAL));
+    const token = readToken();
+    let url = GAS_BASE
+      + '?portal=' + encodeURIComponent(PORTAL)
+      + '&launcher=' + encodeURIComponent(launcherUrl());
+
+    // 端末トークンは#以降で渡す。HTTPリクエストやサーバーログには送信されない。
+    if (token) {
+      url += '#beam_token=' + encodeURIComponent(token);
+    }
+    location.replace(url);
+  }
+
+  const handoff = readHash();
+  if (handoff.clear) {
+    clearToken();
+    cleanHash();
+  }
+
+  if (handoff.token.indexOf('BDT1_') === 0) {
+    if (!saveToken(handoff.token)) {
+      document.getElementById('status').textContent = '端末認証情報を保存できませんでした。ブラウザ設定を確認してください。';
+      return;
+    }
+    cleanHash();
+    document.getElementById('browserHelp').innerHTML = '<p class="small">端末認証を保存しました。BEAMを開いています...</p>';
+    openBeam();
+    return;
   }
 
   document.getElementById('openNow').addEventListener('click', openBeam);
 
-  if (isStandalone() || !isMobileBrowser()) {
+  if (isStandalone()) {
     document.getElementById('browserHelp').innerHTML = '<p class="small">BEAMを開いています...</p>';
-    document.getElementById('status').textContent = '認証はBEAM側で行います。GitHubには認証情報を保存しません。';
-    window.setTimeout(openBeam, 150);
+    openBeam();
   } else {
-    document.getElementById('status').textContent = '認証はBEAM側で行います。GitHubには認証情報を保存しません。';
+    document.getElementById('status').textContent = '初回認証後、この端末にはアクセスキーではなく端末トークンだけを保存します。';
   }
 })();
 </script>
