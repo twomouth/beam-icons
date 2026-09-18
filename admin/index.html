@@ -44,6 +44,13 @@
     return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   }
 
+  function isMobileBrowser() {
+    const ua = String(navigator.userAgent || '');
+    const uaMobile = /iPhone|iPad|iPod|Android/i.test(ua);
+    const touchMobile = navigator.maxTouchPoints > 1 && Math.min(window.innerWidth, window.innerHeight) < 900;
+    return uaMobile || touchMobile;
+  }
+
   function openBeam() {
     // GitHub側にはアクセスキーも端末トークンも保存しない。
     location.replace(GAS_BASE + '?portal=' + encodeURIComponent(PORTAL));
@@ -51,9 +58,10 @@
 
   document.getElementById('openNow').addEventListener('click', openBeam);
 
-  if (isStandalone()) {
+  if (isStandalone() || !isMobileBrowser()) {
     document.getElementById('browserHelp').innerHTML = '<p class="small">BEAMを開いています...</p>';
-    openBeam();
+    document.getElementById('status').textContent = '認証はBEAM側で行います。GitHubには認証情報を保存しません。';
+    window.setTimeout(openBeam, 150);
   } else {
     document.getElementById('status').textContent = '認証はBEAM側で行います。GitHubには認証情報を保存しません。';
   }
