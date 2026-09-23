@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#7b4bc4">
+  <meta name="theme-color" content="#25a55a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="BEAM 管理">
-  <title>BEAM 管理</title>
-  <link rel="apple-touch-icon" href="https://twomouth.github.io/beam-icons/beam-admin.png?v=20260918c">
-  <link rel="icon" type="image/png" href="https://twomouth.github.io/beam-icons/beam-admin.png?v=20260918c">
+  <meta name="apple-mobile-web-app-title" content="BEAM 実務">
+  <title>BEAM 実務</title>
+  <link rel="apple-touch-icon" href="https://twomouth.github.io/beam-icons/beam-work.png?v=20260918c">
+  <link rel="icon" type="image/png" href="https://twomouth.github.io/beam-icons/beam-work.png?v=20260918c">
   <link rel="manifest" href="./manifest.webmanifest?v=20260918b">
   <style>
     :root { color-scheme: light; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Noto Sans JP", sans-serif; }
@@ -20,13 +20,13 @@
     h1 { margin:0 0 8px; font-size:26px; }
     p { margin:8px 0; line-height:1.65; color:#596579; }
     .small { font-size:13px; }
-    button { width:100%; margin-top:16px; border:0; border-radius:12px; padding:13px 16px; font:inherit; font-weight:800; color:#fff; background:#7b4bc4; cursor:pointer; }
+    button { width:100%; margin-top:16px; border:0; border-radius:12px; padding:13px 16px; font:inherit; font-weight:800; color:#fff; background:#25a55a; cursor:pointer; }
   </style>
 </head>
 <body>
   <main class="card">
-    <img class="icon" src="https://twomouth.github.io/beam-icons/beam-admin.png" alt="">
-    <h1>BEAM 管理</h1>
+    <img class="icon" src="https://twomouth.github.io/beam-icons/beam-work.png" alt="">
+    <h1>BEAM 実務</h1>
     <div id="browserHelp">
       <p>このページをホーム画面に追加してください。</p>
       <p class="small">ホーム画面から起動すると、自動でBEAMを開きます。</p>
@@ -38,7 +38,7 @@
 (function () {
   'use strict';
 
-  const PORTAL = 'admin';
+  const PORTAL = 'work';
   const GAS_BASE = 'https://script.google.com/macros/s/AKfycbz-fuUpCKr5s6NhlsKXarmVDSpuRjsoDZ0hBN6Ef8HRZTrZcLSvkctLv54QqwHFzrTx/exec';
 
   function isStandalone() {
