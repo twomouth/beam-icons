@@ -37,84 +37,17 @@
 <script>
 (function () {
   'use strict';
+
   const PORTAL = 'attendance';
   const GAS_BASE = 'https://script.google.com/macros/s/AKfycbz-fuUpCKr5s6NhlsKXarmVDSpuRjsoDZ0hBN6Ef8HRZTrZcLSvkctLv54QqwHFzrTx/exec';
-  const DEVICE_TOKEN_KEY = 'beam_device_token_v1';
 
   function isStandalone() {
     return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   }
 
-  function readToken() {
-    try {
-      const token = String(localStorage.getItem(DEVICE_TOKEN_KEY) || '').trim();
-      return token.indexOf('BDT1_') === 0 ? token : '';
-    } catch (err) {
-      return '';
-    }
-  }
-
-  function saveToken(token) {
-    try {
-      localStorage.setItem(DEVICE_TOKEN_KEY, token);
-      return true;
-    } catch (err) {
-      return false;
-    }
-  }
-
-  function clearToken() {
-    try { localStorage.removeItem(DEVICE_TOKEN_KEY); } catch (err) {}
-  }
-
-  function launcherUrl() {
-    return location.origin + location.pathname;
-  }
-
-  function readHash() {
-    const raw = String(location.hash || '').replace(/^#/, '');
-    const params = new URLSearchParams(raw);
-    return {
-      token: String(params.get('beam_token') || '').trim(),
-      clear: params.get('beam_clear') === '1'
-    };
-  }
-
-  function cleanHash() {
-    if (!location.hash) return;
-    try {
-      history.replaceState(null, document.title, location.pathname + location.search);
-    } catch (err) {}
-  }
-
   function openBeam() {
-    const token = readToken();
-    let url = GAS_BASE
-      + '?portal=' + encodeURIComponent(PORTAL)
-      + '&launcher=' + encodeURIComponent(launcherUrl());
-
-    // 端末トークンは#以降で渡す。HTTPリクエストやサーバーログには送信されない。
-    if (token) {
-      url += '#beam_token=' + encodeURIComponent(token);
-    }
+    const url = GAS_BASE + '?portal=' + encodeURIComponent(PORTAL);
     location.replace(url);
-  }
-
-  const handoff = readHash();
-  if (handoff.clear) {
-    clearToken();
-    cleanHash();
-  }
-
-  if (handoff.token.indexOf('BDT1_') === 0) {
-    if (!saveToken(handoff.token)) {
-      document.getElementById('status').textContent = '端末認証情報を保存できませんでした。ブラウザ設定を確認してください。';
-      return;
-    }
-    cleanHash();
-    document.getElementById('browserHelp').innerHTML = '<p class="small">端末認証を保存しました。BEAMを開いています...</p>';
-    openBeam();
-    return;
   }
 
   document.getElementById('openNow').addEventListener('click', openBeam);
@@ -123,7 +56,7 @@
     document.getElementById('browserHelp').innerHTML = '<p class="small">BEAMを開いています...</p>';
     openBeam();
   } else {
-    document.getElementById('status').textContent = '初回認証後、この端末にはアクセスキーではなく端末トークンだけを保存します。';
+    document.getElementById('status').textContent = '初回のみBEAM画面でアクセスキーを入力します。';
   }
 })();
 </script>
